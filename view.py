@@ -1,75 +1,6 @@
 from Authenticate import *
-# import getpass
-
-# class User:
-#     def register(self):
-#         firstName = input("FirstName: ")
-#         lastName = input("LastName: ")
-#         userId = input("UserID: ")
-#         password = input("Password: ")
-        
-#         obj = Authentication()
-#         obj.registerUser(firstName,lastName,userId,password)
-    
-#     def login(self):
-#         userId = input("userID: ")
-#         password = input("Password: ")
-
-#         obj = Authentication()
-#         obj.loginUser(userId,password)
-
-    
-
-# class Admin:
-#     def loginAdmin(self,adminId,password):
-#         adminId = input("adminID: ")
-#         password = input("Password: ")
-
-#         obj = Authentication()
-#         obj.loginAdmin()
-
-# class viewData:
-#     def viewVehicle():
-
-#         pass
-#     def viewLicense():
-#         pass
-#     def viewChallan():
-#         pass
-
-
-# def main():
-    # print("=========| Welcome, TO RTO |==========")
-    # print("+----+----------------+")
-    # print("| 1. |  User      |")
-    # print("| 2. |  Admin     |")
-    # print("+----+----------------+")
-
-#     user_role=input('Enter Options: ')
-#     match user_role:
-#         case '1':
-#             print('User')
-#             user = User()
-#             user.register()
-            
-#         case '2':
-#             print('Admin')
-#         case _:
-#             print('Invalid choice')
-
-
-# if __name__ == "__main__":
-#     main()
-
-import getpass
 import os
-
-# Sample users and roles data
-users = {
-    'admin': {'password': 'admin', 'role': 'admin'},
-    'bob': {'password': 'qwerty456', 'role': 'user'},
-    'charlie': {'password': 'asdfgh789', 'role': 'user'}
-}
+import getpass
 
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -87,19 +18,20 @@ dataObj = viewData()
 
 def registerUser():
     username = input("Username: ")
-    password = input("Password: ")
+    password = getpass.getpass("Password: ")
 
     obj.registerUser(username,password)
 
 def loginUser():
     username = input("Username: ")
-    password = input("password: ")
+    password = getpass.getpass("password: ")
 
     x = obj.loginUser(username,password)
     if x is True:
         user_menu()
 
 def user():
+    clear_screen()
     print("1.Login - Already a User")
     print("2.Register - New User")
     print("3.Exit")
@@ -123,41 +55,45 @@ def user():
 
 
 def admin_menu():
+    clear_screen()
     while True:
         print_header("Admin Menu")
         print("1. View Vehicles")
-        print("2. View Licenses")
-        print("3. View Challans")
-        print("4. Approve Vehicle Registration")
-        print("5. Approve License")
-        print("6. Generate Challan for Users")
-        print("7. Apply for Scrap")
-        print("8. Logout")
+        print("2. View all Vehicles")
+        print("3. View Licenses")
+        print("4. View Challans")
+        print("5. Approve Vehicle Registration")
+        print("6. Approve License")
+        print("7. Generate Challan for Users")
+        print("8. Approve for Scrap")
+        print("9. Logout")
         choice = input("\nEnter your choice: ")
         
         match choice:
             case '1':
                 view_vehicles()
             case '2':
-                view_licenses()
+                view_AllVehicles()
             case '3':
-                view_challans()
+                view_licenses()
             case '4':
-                approve_vehicle_registration()
+                view_challans()
             case '5':
-                approve_license()
+                approve_vehicle_registration()
             case '6':
-                generate_challan()
-
+                approve_license()
             case '7':
-                approve_scrap()
+                generate_challan()
             case '8':
+                approve_scrap()
+            case '9':
                 main()
             case _:
                 print("Invalid choice. Please try again.")
         input("\nPress Enter to continue...")
 
 def user_menu():
+    clear_screen()
     while True:
         print_header("User Menu")
         print("1. Apply Vehicle Registration")
@@ -195,9 +131,14 @@ def user_menu():
 def view_vehicles():
     regisNo = input("Registration Number: ")
     dataObj.viewVehicles(regisNo)
+    
+def view_AllVehicles():
+    print("Showing all Vehicles: ")
+    dataObj.viewAllVehicles()
 
 def view_licenses():
-    pass
+    userId = input("UserID: ")
+    dataObj.viewLicenses(userId)
 
 def view_challans():
     regiNo = input("Registration Number: ")
@@ -253,41 +194,13 @@ def change_owner():
 
     objUser.changeOwner(regisNo,newOwner,newAdhar)
 
-# def view_vehicle():
-#     print_header("View Vehicle")
-#     print("Viewing vehicle...")
-
-# def view_license():
-#     print_header("View License")
-#     print("Viewing license...")
-
-# def view_challan():
-#     print_header("View Challan")
-#     print("Viewing challan...")
-
-# def login():
-#     clear_screen()
-#     print_header("CLI Login Portal")
-#     username = input("Username: ")
-#     password = getpass.getpass("Password: ")
-    
-#     if username in users and users[username]['password'] == password:
-#         print(f"\nWelcome, {username}!")
-#         input("\nPress Enter to continue...")
-#         role = users[username]['role']
-#         if role == 'admin':
-#             admin_menu()
-#         elif role == 'user':
-#             user_menu()
-#     else:
-#         print("\nInvalid username or password. Please try again.")
-#         input("\nPress Enter to continue...")
-
 def main():
-    print("=========| Welcome, TO RTO |==========")
+    clear_screen()
+    print_header("=========| Welcome, TO RTO |==========")
     print("+----+----------------+")
     print("| 1. |  User      |")
     print("| 2. |  Admin     |")
+    print("| 3. |  Exit      |")
     print("+----+----------------+")
 
     user_input = int(input("Enter the option: "))
@@ -297,11 +210,14 @@ def main():
             user()
         case 2:
             adminId = input("adminID: ")
-            password = input("Password: ")
+            password = getpass.getpass("Password: ")
 
             x=obj.loginAdmin(adminId,password)
             if x is True:
                 admin_menu()
+        case 3:
+            print("Bye Bye")
+            exit()
         case _:
             print("Invalid choice")
 

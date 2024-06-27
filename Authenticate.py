@@ -72,10 +72,11 @@ class Authentication:
 
 
 class VehicleRegistration:
-    def __init__(self, prefix):
+    def __init__(self, prefix):#constructor
         self.prefix = prefix
         self.current_number = 0
 
+    #creating 6-digit unique number
     def generate_registration_number(self):
         self.current_number += 1
         return f"{self.prefix}{self.current_number:06d}"
@@ -90,6 +91,20 @@ class viewData:
 
             query = 'select * from vehicle_registrations where registration_number = %(registration_number)s'
             cur.execute(query,{'registration_number':regisNo})
+            res = cur.fetchall()
+
+            for row in res:
+                print(row)
+        except Error as e:
+            print(f"Cannot fetch records!: {e}")
+            
+    def viewAllVehicles(self):
+        try:
+            conn = connect_db()
+            cur = conn.cursor()
+
+            query = 'select * from vehicle_registrations '
+            cur.execute(query)
             res = cur.fetchall()
 
             for row in res:
@@ -112,12 +127,40 @@ class viewData:
         except Error as e:
             print(f"No challan Data found!: {e}")
 
+    def viewLicenses(self,userid):
+        try:
+            conn = connect_db()
+            cur = conn.cursor()
+
+            query = 'select * from driving_licenses where user_id = %(user_id)s'
+            cur.execute(query,{'user_id':userid})
+            res = cur.fetchall()
+
+            for row in res:
+                print(row)
+            
+        except Error as e:
+            print(f"No challan Data found!: {e}")
+            
+def checkaadhar(a):
+    if len(a)!=12:
+        print("Aadhar number should be of length 12!!!")
+        return True
+    else:
+        return False
+
+
 #bgrp,add,uid, name,
 class User:
     def apply_for_registration(self, user_id, purchase_date, engine_number, chassis_number, owner_name,adhar):
         try:
             conn = connect_db()
             cur = conn.cursor()
+            
+            x=checkaadhar(adhar)
+            if x is True:
+                return
+            
             query = 'insert into vehicle_registrations (user_id,purchase_date,engine_number,chassis_number,owner_name,aadhar_card) values(%s,%s,%s,%s,%s,%s)'
             cur.execute(query,(user_id,purchase_date, engine_number, chassis_number, owner_name,adhar))
             conn.commit()
@@ -131,19 +174,10 @@ class User:
             conn = connect_db()
             cur = conn.cursor()
 
-            # Issue Need to resolved----------
-
-            # cur.execute('select license_number from driving_licenses where user_id=%(user_id)s',{'user_id':uid})
-            # res = cur.fetchone()
-            # for lno in res:
-            #     print(lno)
-            #     if lno is None:
-            #         print("Already Owns a License")
-            #         return
-                # if lno is no:
-                #     print(f"Chalaan with this id {chalaan_id} is Already Paid!")
-                    # return
-
+            x=checkaadhar(adhar)
+            if x is True:
+                return
+            
             ageObj = ageCalculator()
             res = ageObj.is_greater(dob,18)
             if res is False:
@@ -153,6 +187,7 @@ class User:
             age = ageObj.is_greater(dob,75)
             if age is True:
                 print("Age Limit Exceeded!")
+                return
 
             query = 'insert into driving_licenses (name,date_of_birth,blood_group,address,user_id,aadhar_card) values(%s,%s,%s,%s,%s,%s)'
             cur.execute(query,(name,dob,bgrp,add,uid,adhar))
@@ -169,7 +204,11 @@ class User:
             cur = conn.cursor()
             objView = viewData()
             objView.viewVehicles(regisNo)
-
+            
+            x=checkaadhar(newadhar)
+            if x is True:
+                return
+            
             query = 'update vehicle_registrations set owner_name = %s,aadhar_card = %s where registration_number = %s'
             cur.execute(query,(newOwner,newadhar,regisNo))
             conn.commit()
@@ -389,7 +428,8 @@ objAdmin = Admin()
 # objAdmin.viewPendingLicenses()
 # objAdmin.approve_licenses("1001")
 
-
+objView = viewData()
+# objView.viewLicenses("1005")
 # obj=Vehicle()
 # obj.viewPendingRegistration()
 # obj.generate_registration_number("1001")
